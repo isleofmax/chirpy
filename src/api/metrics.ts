@@ -1,7 +1,7 @@
 import type { Request, Response } from "express";
 import { config } from "../config.js";
 
-export function metrics(req: Request, res: Response) {
+export async function metrics(req: Request, res: Response) {
   const hits = config.fileserverHits;
   res.set("Content-Type", "text/html");
   res.set("charset", "utf-8");
