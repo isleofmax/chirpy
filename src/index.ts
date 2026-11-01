@@ -3,7 +3,7 @@ import { readiness } from "./api/readiness.js";
 import { reset } from "./api/reset.js";
 import { metrics } from "./api/metrics.js";
 import { validateChirp } from "./api/validate_chirp.js";
-import { middlewareLogResponses, middlewareMetricsInc } from "./api/middleware.js";
+import { middlewareLogResponses, middlewareMetricsInc, errorHandler } from "./api/middleware.js";
 
 const app: Express = express();
 const port = 8080;
@@ -18,6 +18,7 @@ app.get("/admin/metrics", metrics);
 app.post("/api/validate_chirp", validateChirp);
 app.post("/admin/reset", reset);
 
+app.use(errorHandler);
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
 });

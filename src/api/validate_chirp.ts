@@ -9,8 +9,9 @@ export async function validateChirp(req: Request, res: Response) {
 
   res.header("Content-Type", "application/json");
   if (!parsedBody.body || parsedBody.body.length > 140) {
-    res.status(400).send(JSON.stringify({ error: "Chirp is too long" }));
-    return;
+    throw new Error("Chirp is too long");
+    //res.status(400).send(JSON.stringify({ error: "Chirp is too long" }));
+    //return;
   }
 
   const words = parsedBody.body.split(" ");
