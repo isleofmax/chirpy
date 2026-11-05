@@ -1,6 +1,6 @@
 import type { Request, Response, NextFunction } from "express";
 import { config } from "../config.js";
-import { BadRequestError } from "./errors.js";
+import { BadRequestError, ForbiddenError } from "./errors.js";
 
 export function middlewareLogResponses(req: Request, res: Response, next: NextFunction) {
   res.on("finish", () => {
@@ -19,6 +19,9 @@ export function middlewareMetricsInc(req: Request, res: Response, next: NextFunc
 export function errorHandler(err: Error, req: Request, res: Response, next: NextFunction) {
   if (err instanceof BadRequestError) {
     res.status(400).send(JSON.stringify({ error: err.message }));
+    return;
+  } else if (err instanceof ForbiddenError) {
+    res.status(403).send(JSON.stringify({ error: err.message }));
     return;
   }
   console.log("500 - Internal Server Errors");
