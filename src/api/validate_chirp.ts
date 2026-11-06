@@ -25,5 +25,6 @@ export async function validateChirp(req: Request, res: Response) {
   }
   const newPhrase = newWords.join(" ");
 
+  console.log("chirp");
   res.status(200).send(JSON.stringify({ cleanedBody: newPhrase }));
 }
