@@ -8,6 +8,27 @@
       "when": 1793599894951,
       "tag": "0000_awesome_iceman",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1794034229455,
+      "tag": "0001_large_thor",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1794034389745,
+      "tag": "0002_handy_rocket_raccoon",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1794039041339,
+      "tag": "0003_uneven_fantastic_four",
+      "breakpoints": true
     }
   ]
 }

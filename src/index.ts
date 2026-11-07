@@ -6,7 +6,7 @@ import { readiness } from "./api/readiness.js";
 import { reset } from "./api/reset.js";
 import { metrics } from "./api/metrics.js";
 import { users } from "./api/users.js";
-import { validateChirp } from "./api/validate_chirp.js";
+import { chirps } from "./api/chirps.js";
 import { middlewareLogResponses, middlewareMetricsInc, errorHandler } from "./api/middleware.js";
 import { config } from "./config.js";
 
@@ -27,14 +27,14 @@ app.get("/admin/metrics", (req, res, next) => {
   Promise.resolve(metrics(req, res)).catch(next);
 });
 
-app.post("/api/validate_chirp", (req, res, next) => {
-  Promise.resolve(validateChirp(req, res)).catch(next);
-});
 app.post("/admin/reset", (req, res, next) => {
   Promise.resolve(reset(req, res)).catch(next);
 });
 app.post("/api/users", (req, res, next) => {
   Promise.resolve(users(req, res)).catch(next);
+});
+app.post("/api/chirps", (req, res, next) => {
+  Promise.resolve(chirps(req, res)).catch(next);
 });
 
 app.use(errorHandler);
