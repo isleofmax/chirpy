@@ -2,9 +2,9 @@ import { Request, Response } from "express";
 import { BadRequestError, NotFoundError } from "./errors.js";
 import { findUser } from "../db/queries/users.js";
 import type { NewChirp } from "../db/schema.js";
-import { createChirp } from "../db/queries/chirps.js";
+import { createChirp, chirpsOrderByCreation, chirpById } from "../db/queries/chirps.js";
 
-export async function chirps(req: Request, res: Response) {
+export async function createNewChirp(req: Request, res: Response) {
   type Parameters = {
     body: string;
     userId: string;
@@ -31,6 +31,24 @@ export async function chirps(req: Request, res: Response) {
   }
   res.header("Content-Type", "application/json");
   res.status(201).send(JSON.stringify(result));
+}
+
+export async function getChirpsByCreation(req: Request, res: Response) {
+  const result = await chirpsOrderByCreation();
+  res.status(200).send(JSON.stringify(result));
+}
+
+export async function getChirpById(req: Request, res: Response) {
+  const { chirpId } = req.params;
+  
+  if (!chirpId || typeof chirpId !== "string") {
+    throw new BadRequestError("Bad request: invaid parameters");
+  }
+  const result = await chirpById(chirpId);
+  if (!result) {
+    throw new NotFoundError("Chirp not found");
+  }
+  res.status(200).send(JSON.stringify(result));
 }
 
 function validateChirp(body: string) {

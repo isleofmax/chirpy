@@ -6,7 +6,7 @@ import { readiness } from "./api/readiness.js";
 import { reset } from "./api/reset.js";
 import { metrics } from "./api/metrics.js";
 import { users } from "./api/users.js";
-import { chirps } from "./api/chirps.js";
+import { createNewChirp, getChirpsByCreation, getChirpById } from "./api/chirps.js";
 import { middlewareLogResponses, middlewareMetricsInc, errorHandler } from "./api/middleware.js";
 import { config } from "./config.js";
 
@@ -20,6 +20,12 @@ app.use("/app", middlewareMetricsInc, express.static("./src/app"));
 app.use(middlewareLogResponses);
 app.use(express.json());
 
+app.get("/api/chirps", (req, res, next) => {
+  Promise.resolve(getChirpsByCreation(req, res)).catch(next);
+});
+app.get("/api/chirps/:chirpId", (req, res, next) => {
+  Promise.resolve(getChirpById(req, res)).catch(next);
+});
 app.get("/api/healthz", (req, res, next) => {
   Promise.resolve(readiness(req, res)).catch(next);
 });
@@ -34,7 +40,7 @@ app.post("/api/users", (req, res, next) => {
   Promise.resolve(users(req, res)).catch(next);
 });
 app.post("/api/chirps", (req, res, next) => {
-  Promise.resolve(chirps(req, res)).catch(next);
+  Promise.resolve(createNewChirp(req, res)).catch(next);
 });
 
 app.use(errorHandler);
