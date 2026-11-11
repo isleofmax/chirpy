@@ -6,6 +6,7 @@ import { readiness } from "./api/readiness.js";
 import { reset } from "./api/reset.js";
 import { metrics } from "./api/metrics.js";
 import { users } from "./api/users.js";
+import { login } from "./api/login.js";
 import { createNewChirp, getChirpsByCreation, getChirpById } from "./api/chirps.js";
 import { middlewareLogResponses, middlewareMetricsInc, errorHandler } from "./api/middleware.js";
 import { config } from "./config.js";
@@ -38,6 +39,9 @@ app.post("/admin/reset", (req, res, next) => {
 });
 app.post("/api/users", (req, res, next) => {
   Promise.resolve(users(req, res)).catch(next);
+});
+app.post("/api/login", (req, res, next) => {
+  Promise.resolve(login(req, res)).catch(next);
 });
 app.post("/api/chirps", (req, res, next) => {
   Promise.resolve(createNewChirp(req, res)).catch(next);

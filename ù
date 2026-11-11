@@ -1,0 +1,35 @@
+import { Request, Response } from "express";
+import { UnauthorizedError, BadRequestError } from "./errors.js";
+import { hashPassword, checkPasswordHash } from "./auth.js";
+import { createUser } from "../db/queries/users.js";
+import type { NewUser } from "../db/schema.js";
+
+export async function login(req: Request, res: Response) {
+  type Parameters = {
+    email: string;
+    password: string;
+  }
+
+  const body: Parameters = await req.body;
+  if (!body.email || !body.password) {
+    throw new BadRequestError("Bad Request: invalid parameters");
+  }
+
+  const newUser: NewUser = { email: body.email };
+
+  const user = await getUser(newUser);
+  if (!user) {
+    throw new UnauthorizedError("incorrect email or password");
+  }
+
+  const password = await hashPassword(body.password);
+  if (!user.checkPasswordHash) {
+    throw new UnauthorizedError("incorrect email or password");
+  }
+
+  type UserResponse = Omit<NewUser, "hashedPassworduserId">; 
+  const userResponse: UserResponse = user;
+
+  res.header("Content-Type", "application/json");
+  res.status(201).send(JSON.stringify(user));
+}

@@ -1,6 +1,6 @@
 import type { Request, Response, NextFunction } from "express";
 import { config } from "../config.js";
-import { BadRequestError, ForbiddenError, NotFoundError } from "./errors.js";
+import { BadRequestError, ForbiddenError, NotFoundError, UnauthorizedError } from "./errors.js";
 
 export function middlewareLogResponses(req: Request, res: Response, next: NextFunction) {
   res.on("finish", () => {
@@ -26,6 +26,9 @@ export function errorHandler(err: Error, req: Request, res: Response, next: Next
   } else if (err instanceof NotFoundError) {
     res.status(404).send(JSON.stringify({ error: err.message }));
     return;
+  } else if (err instanceof UnauthorizedError) {
+    res.status(401).send(JSON.stringify({ error: err.message }));
+    return;
   }
-  console.log("500 - Internal Server Errors");
+  res.status(500).send({ error: err.message });
 }

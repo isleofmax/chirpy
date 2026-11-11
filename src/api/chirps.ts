@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { BadRequestError, NotFoundError } from "./errors.js";
-import { findUser } from "../db/queries/users.js";
+import { getUserById } from "../db/queries/users.js";
 import type { NewChirp } from "../db/schema.js";
 import { createChirp, chirpsOrderByCreation, chirpById } from "../db/queries/chirps.js";
 
@@ -16,7 +16,7 @@ export async function createNewChirp(req: Request, res: Response) {
   }
 
   const chirpMessage = validateChirp(params.body);
-  const user = await findUser(params.userId);
+  const user = await getUserById(params.userId);
   if (!user) {
     throw new NotFoundError("User not found");
   }
