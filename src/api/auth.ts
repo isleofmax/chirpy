@@ -20,10 +20,11 @@ export async function checkPasswordHash(password: string, hash: string): Promise
   }
 }
 
-function makeJWT(userID: string, expiresIn: number, secret: string): string {
+export function makeJWT(userID: string, expiresIn: number, secret: string): string {
   type payload = Pick<JwtPayload, "iss" | "sub" | "iat" | "exp">;
+  return "";
 }
 
-function validateJWT(tokenString: string, secret: string): string {
-
+export function validateJWT(tokenString: string, secret: string): string {
+  return "";
 }
