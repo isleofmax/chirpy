@@ -1,7 +1,7 @@
 import argon2 from "argon2";
 import jwt from "jsonwebtoken";
 import type { JwtPayload } from "jsonwebtoken";
-import { UnauthorizedError } from "./errors.js";
+import { UnauthorizedError, BadRequestError } from "./errors.js";
 
 type payload = Pick<JwtPayload, "iss" | "sub" | "iat" | "exp">;
 
@@ -47,4 +47,26 @@ export function validateJWT(tokenString: string, secret: string): string {
   } catch (err) {
     throw new UnauthorizedError("Invalid token");
   }
+}
+
+export function extractBearerToken(authorization: string | undefined): string {
+  if (authorization === undefined) {
+    throw new BadRequestError("Authorization string not found");
+  }
+  const words = authorization.split(" ");
+  let foundBearer = false;
+
+  for (let word of words) {
+    if (foundBearer === false) {
+      if (word.length !== 0 && word === "Bearer") {
+        foundBearer = true;
+      }
+    } else {
+      if (word.length !== 0) {
+        return word;
+      }
+    }
+  }
+
+  throw new BadRequestError("Authorization string not found");
 }

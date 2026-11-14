@@ -1,6 +1,6 @@
-import { describe, it, expect, beforeAll } from "vitest";
-import { makeJWT, validateJWT, hashPassword, checkPasswordHash } from "./api/auth.js";
-import { UnauthorizedError } from "./api/errors.js";
+import { describe, it, expect, beforeAll, } from "vitest";
+import { makeJWT, validateJWT, hashPassword, checkPasswordHash, extractBearerToken } from "./api/auth.js";
+import { UnauthorizedError, BadRequestError } from "./api/errors.js";
 
 describe("Password Hashing", () => {
   const password1 = "correctPassword123!";
@@ -57,5 +57,35 @@ describe("JWT sign and verify", () => {
   it("error in validation for invalid token", () => {
     expect(() => validateJWT("invalidtoken", secret)).toThrow(UnauthorizedError);
   });
+});
+
+describe("Verify token string", () => {
+  const token = "TOKEN";
+  const validString = `Bearer ${token}`;
+  const notBearer = `${token}`;
+  const splittedToken = `${token} Bearer`;
+  const otherNotBearer = `Barrrr ${token}`;
+
+  it("Should throw error if token is undefined", () => {
+    expect(() => extractBearerToken(undefined)).toThrow(BadRequestError);
+  });
+
+  it("the string is valid", () => {
+    const validToken  = extractBearerToken(validString);
+    expect(validToken).toBe(token);
+  });
+
+  it("Should throw error if the string have not the word 'Bearer'", () => {
+    expect(() => extractBearerToken(notBearer)).toThrow(BadRequestError);
+  });
+
+  it("Should throw error if the string have the token before Bearer", () => {
+    expect(() => extractBearerToken(splittedToken)).toThrow(BadRequestError);
+  });
+
+  it("Should throw error if the string have the word Barrrr", () => {
+    expect(() => extractBearerToken(otherNotBearer)).toThrow(BadRequestError);
+  });
+
 });
 
