@@ -1,22 +1,25 @@
 import { Request, Response } from "express";
-import { BadRequestError, NotFoundError } from "./errors.js";
+import { BadRequestError, NotFoundError, UnauthorizedError } from "./errors.js";
 import { getUserById } from "../db/queries/users.js";
 import type { NewChirp } from "../db/schema.js";
 import { createChirp, chirpsOrderByCreation, chirpById } from "../db/queries/chirps.js";
+import { validateJWT, getBearerToken } from "./auth.js";
+import { config } from "../config.js";
 
 export async function createNewChirp(req: Request, res: Response) {
   type Parameters = {
     body: string;
-    userId: string;
   };
 
   const params: Parameters = await req.body;
-  if (!params.userId || !params.body) {
+  if (!params.body) {
     throw new BadRequestError("Bad request: invaid parameters");
   }
 
+  const token = getBearerToken(req);
+  const userId = validateJWT(token, config.apiConfig.secret);
   const chirpMessage = validateChirp(params.body);
-  const user = await getUserById(params.userId);
+  const user = await getUserById(userId);
   if (!user) {
     throw new NotFoundError("User not found");
   }

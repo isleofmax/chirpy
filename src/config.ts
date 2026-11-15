@@ -15,6 +15,7 @@ type APIConfig = {
   fileserverHits: number;
   port: number;
   platform: string;
+  secret: string;
 };
 
 type Config = {
@@ -30,7 +31,8 @@ export const config: Config = {
   apiConfig: {
     fileserverHits: 0,
     port: Number(envOrThrow(process.env.PORT)),
-    platform: envOrThrow(process.env.PLATFORM)
+    platform: envOrThrow(process.env.PLATFORM),
+    secret: envOrThrow(process.env.SECRET)
   }
 };
 

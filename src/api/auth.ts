@@ -2,6 +2,7 @@ import argon2 from "argon2";
 import jwt from "jsonwebtoken";
 import type { JwtPayload } from "jsonwebtoken";
 import { UnauthorizedError, BadRequestError } from "./errors.js";
+import { Request } from "express";
 
 type payload = Pick<JwtPayload, "iss" | "sub" | "iat" | "exp">;
 
@@ -69,4 +70,13 @@ export function extractBearerToken(authorization: string | undefined): string {
   }
 
   throw new BadRequestError("Authorization string not found");
+}
+
+export function getBearerToken(req: Request): string {
+  const bearer = req.get("Authorization");
+  if (!bearer) {
+    throw new UnauthorizedError("Unauthorized");
+  }
+  const token = extractBearerToken(bearer);
+  return token;
 }
