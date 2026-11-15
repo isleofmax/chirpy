@@ -1,15 +1,15 @@
 import { Request, Response } from "express";
 import { UnauthorizedError, BadRequestError } from "./errors.js";
-import { hashPassword, checkPasswordHash, makeJWT } from "./auth.js";
+import { hashPassword, checkPasswordHash, makeJWT, makeRefreshToken } from "./auth.js";
 import { getUserByEmail } from "../db/queries/users.js";
+import { createRefreshToken } from "../db/queries/refreshTokens.js";
 import { config } from "../config.js";
-import type { NewUser } from "../db/schema.js";
+import { type NewRefreshToken } from "../db/schema.js";
 
 export async function login(req: Request, res: Response) {
   type Parameters = {
     email: string;
     password: string;
-    expiresInSeconds?: number;
   }
 
   const body: Parameters = await req.body;
@@ -31,20 +31,23 @@ export async function login(req: Request, res: Response) {
     throw new UnauthorizedError("incorrect email or password");
   }
 
-  let expiresIn = 3600;
-  if (body.expiresInSeconds !== undefined) {
-    if (body.expiresInSeconds < expiresIn) {
-      expiresIn = body.expiresInSeconds;
-    }
-  }
-  const token = makeJWT(user.id, expiresIn, config.apiConfig.secret);
+  const token = makeJWT(user.id, 3600, config.apiConfig.secret);
+  const refreshToken = makeRefreshToken();
+  const newRefreshToken: NewRefreshToken = {
+    token: refreshToken,
+    expiresAt: new Date(Date.now() + 5184000000),
+    revokedAt: null,
+    userId: user.id
+  };
+  const refreshTokenTable = await createRefreshToken(newRefreshToken);
   
   const response = {
     id: user.id,
     createdAt: user.createdAt,
     updatedAt: user.updatedAt,
     email: user.email,
-    token: token
+    token: token,
+    refreshToken: refreshTokenTable.token
   };
 
   res.header("Content-Type", "application/json");
