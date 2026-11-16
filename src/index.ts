@@ -5,11 +5,11 @@ import { drizzle } from "drizzle-orm/postgres-js";
 import { readiness } from "./api/readiness.js";
 import { reset } from "./api/reset.js";
 import { metrics } from "./api/metrics.js";
-import { users } from "./api/users.js";
+import { users, updateUser } from "./api/users.js";
 import { login } from "./api/login.js";
 import { refresh } from "./api/refresh.js";
 import { revoke } from "./api/revoke.js";
-import { createNewChirp, getChirpsByCreation, getChirpById } from "./api/chirps.js";
+import { createNewChirp, getChirpsByCreation, getChirpById, deleteChirp } from "./api/chirps.js";
 import { middlewareLogResponses, middlewareMetricsInc, errorHandler } from "./api/middleware.js";
 import { config } from "./config.js";
 
@@ -53,6 +53,14 @@ app.post("/api/refresh", (req, res, next) => {
 });
 app.post("/api/revoke", (req, res, next) => {
   Promise.resolve(revoke(req, res)).catch(next);
+});
+
+app.put("/api/users", (req, res, next) => {
+  Promise.resolve(updateUser (req, res)).catch(next);
+});
+
+app.delete("/api/chirps/:chirpId", (req, res, next) => {
+  Promise.resolve(deleteChirp (req, res)).catch(next);
 });
 
 app.use(errorHandler);

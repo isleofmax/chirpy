@@ -12,7 +12,7 @@ export async function login(req: Request, res: Response) {
     password: string;
   }
 
-  const body: Parameters = await req.body;
+  const body: Parameters = req.body;
   if (!body.email || !body.password) {
     throw new BadRequestError("Bad Request: invalid parameters");
   }

@@ -11,7 +11,7 @@ export async function createNewChirp(req: Request, res: Response) {
     body: string;
   };
 
-  const params: Parameters = await req.body;
+  const params: Parameters = req.body;
   if (!params.body) {
     throw new BadRequestError("Bad request: invaid parameters");
   }
@@ -52,6 +52,15 @@ export async function getChirpById(req: Request, res: Response) {
     throw new NotFoundError("Chirp not found");
   }
   res.status(200).send(JSON.stringify(result));
+}
+
+export async function deleteChirp(req: Request, res: Response) {
+  const { chirpId } = req.params;
+  if (!chirpId || typeof chirpId !== "string") {
+    throw new NotFoundError("Bad request: invaid parameters");
+  }
+
+  res.status(204).send("OK");
 }
 
 function validateChirp(body: string) {

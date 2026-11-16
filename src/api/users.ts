@@ -1,7 +1,8 @@
 import { Request, Response } from "express";
-import { BadRequestError } from "./errors.js";
-import { hashPassword } from "./auth.js";
-import { createUser } from "../db/queries/users.js";
+import { BadRequestError, UnauthorizedError } from "./errors.js";
+import { hashPassword, getBearerToken, validateJWT } from "./auth.js";
+import { createUser, getUserById, updateUsers } from "../db/queries/users.js";
+import { config } from "../config.js";
 import type { NewUser, UserResponse } from "../db/schema.js";
 
 export async function users(req: Request, res: Response) {
@@ -10,7 +11,7 @@ export async function users(req: Request, res: Response) {
     email: string;
   }
 
-  const body: Parameters = await req.body;
+  const body: Parameters = req.body;
   if (!body.email || !body.password) {
     throw new BadRequestError("Bad Request: invalid parameters");
   }
@@ -32,4 +33,36 @@ export async function users(req: Request, res: Response) {
 
   res.header("Content-Type", "application/json");
   res.status(201).send(JSON.stringify(userResponse));
+}
+
+export async function updateUser(req: Request, res: Response) {
+  type Parameters = {
+    password: string;
+    email: string;
+  }
+
+  const body: Parameters = req.body;
+  if (!body.email || !body.password) {
+    throw new BadRequestError("Bad Request: invalid parameters");
+  }
+
+  const token = getBearerToken(req);
+  const userId = validateJWT(token, config.apiConfig.secret);
+  const user = await getUserById(userId);
+  if (!user) {
+    throw new UnauthorizedError("Unauthorized: invalid token");
+  }
+
+  const password = await hashPassword(body.password);
+
+  const updatedUser = await updateUsers(user.id, body.email, password);
+  const userResponse: UserResponse = {
+    id: updatedUser.id,
+    createdAt: updatedUser.createdAt,
+    updatedAt: updatedUser.updatedAt,
+    email: updatedUser.email,
+  };
+
+  res.header("Content-Type", "application/json");
+  res.status(200).send(JSON.stringify(userResponse));
 }
