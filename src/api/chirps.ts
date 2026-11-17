@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
-import { BadRequestError, NotFoundError, UnauthorizedError } from "./errors.js";
+import { BadRequestError, NotFoundError, UnauthorizedError, ForbiddenError } from "./errors.js";
 import { getUserById } from "../db/queries/users.js";
 import type { NewChirp } from "../db/schema.js";
-import { createChirp, chirpsOrderByCreation, chirpById } from "../db/queries/chirps.js";
+import { createChirp, chirpsOrderByCreation, chirpById, deleteChirpById } from "../db/queries/chirps.js";
 import { validateJWT, getBearerToken } from "./auth.js";
 import { config } from "../config.js";
 
@@ -57,7 +57,23 @@ export async function getChirpById(req: Request, res: Response) {
 export async function deleteChirp(req: Request, res: Response) {
   const { chirpId } = req.params;
   if (!chirpId || typeof chirpId !== "string") {
-    throw new NotFoundError("Bad request: invaid parameters");
+    throw new BadRequestError("Bad request: invaid parameters");
+  }
+
+  const token = getBearerToken(req);
+  const userId = validateJWT(token, config.apiConfig.secret);
+
+  const findChirp = await chirpById(chirpId);
+  if (!findChirp) {
+    throw new NotFoundError("Chirp not found");
+  }
+  if (findChirp.userId !== userId ) {
+    throw new ForbiddenError("Forbidden: user not allowed to delete");
+  }
+
+  const chirp = deleteChirpById(chirpId, userId);
+  if (! chirp) {
+    throw new NotFoundError("Chirp not found");
   }
 
   res.status(204).send("OK");
@@ -76,7 +92,7 @@ function validateChirp(body: string) {
       newWords.push("****");
     } else {
       newWords.push(word);
-	  }
+    }
   }
   return newWords.join(" ");
 }
