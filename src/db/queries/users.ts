@@ -25,3 +25,8 @@ export async function updateUsers(userId: string, email: string, password: strin
   const [result] = await db.update(users).set({ email: email, hashedPassword: password }).where(eq(users.id, userId)).returning();
   return result;
 }
+
+export async function updateUserToChirpyRed(userId: string) {
+  const [result] = await db.update(users).set({ isChirpyRed: true }).where(eq(users.id, userId)).returning();
+  return result;
+}

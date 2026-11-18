@@ -47,7 +47,8 @@ export async function login(req: Request, res: Response) {
     updatedAt: user.updatedAt,
     email: user.email,
     token: token,
-    refreshToken: refreshTokenTable.token
+    refreshToken: refreshTokenTable.token,
+    isChirpyRed: user.isChirpyRed,
   };
 
   res.header("Content-Type", "application/json");

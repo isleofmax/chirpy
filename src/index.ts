@@ -6,6 +6,7 @@ import { readiness } from "./api/readiness.js";
 import { reset } from "./api/reset.js";
 import { metrics } from "./api/metrics.js";
 import { users, updateUser } from "./api/users.js";
+import { polkaWebhooks } from "./api/polka.js";
 import { login } from "./api/login.js";
 import { refresh } from "./api/refresh.js";
 import { revoke } from "./api/revoke.js";
@@ -53,6 +54,9 @@ app.post("/api/refresh", (req, res, next) => {
 });
 app.post("/api/revoke", (req, res, next) => {
   Promise.resolve(revoke(req, res)).catch(next);
+});
+app.post("/api/polka/webhooks", (req, res, next) => {
+  Promise.resolve(polkaWebhooks(req, res)).catch(next);
 });
 
 app.put("/api/users", (req, res, next) => {

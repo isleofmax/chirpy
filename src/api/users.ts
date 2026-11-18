@@ -29,6 +29,7 @@ export async function users(req: Request, res: Response) {
     createdAt: user.createdAt,
     updatedAt: user.updatedAt,
     email: user.email,
+    isChirpyRed: user.isChirpyRed,
   };
 
   res.header("Content-Type", "application/json");
@@ -61,6 +62,7 @@ export async function updateUser(req: Request, res: Response) {
     createdAt: updatedUser.createdAt,
     updatedAt: updatedUser.updatedAt,
     email: updatedUser.email,
+    isChirpyRed: updatedUser.isChirpyRed,
   };
 
   res.header("Content-Type", "application/json");
