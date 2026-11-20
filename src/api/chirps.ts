@@ -37,7 +37,18 @@ export async function createNewChirp(req: Request, res: Response) {
 }
 
 export async function getChirpsByCreation(req: Request, res: Response) {
-  const result = await chirpsOrderByCreation();
+  let authorId = "";
+  const authorIdQuery = req.query.authorId;
+  if (typeof authorIdQuery === "string") {
+    authorId = authorIdQuery;
+  }
+
+  let sort = "";
+  const sortQuery = req.query.sort;
+  if (typeof sortQuery === "string") {
+    sort = sortQuery;
+  }
+  const result = await chirpsOrderByCreation(authorId, sort);
   res.status(200).send(JSON.stringify(result));
 }
 

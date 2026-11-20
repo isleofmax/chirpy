@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 import type { JwtPayload } from "jsonwebtoken";
 import { UnauthorizedError, BadRequestError } from "./errors.js";
 import { Request } from "express";
-import { randomBytes } from "node:crypto";
+import crypto from "crypto";
 
 type payload = Pick<JwtPayload, "iss" | "sub" | "iat" | "exp">;
 
@@ -51,17 +51,17 @@ export function validateJWT(tokenString: string, secret: string): string {
   }
 }
 
-export function extractBearerToken(authorization: string | undefined): string {
+export function extractToken(authorization: string | undefined, type: string): string {
   if (authorization === undefined) {
     throw new BadRequestError("Authorization string not found");
   }
   const words = authorization.split(" ");
-  let foundBearer = false;
+  let foundToken = false;
 
   for (let word of words) {
-    if (foundBearer === false) {
-      if (word.length !== 0 && word === "Bearer") {
-        foundBearer = true;
+    if (foundToken === false) {
+      if (word.length !== 0 && word === type) {
+        foundToken = true;
       }
     } else {
       if (word.length !== 0) {
@@ -78,10 +78,19 @@ export function getBearerToken(req: Request): string {
   if (!bearer) {
     throw new UnauthorizedError("Unauthorized");
   }
-  const token = extractBearerToken(bearer);
+  const token = extractToken(bearer, "Bearer");
   return token;
 }
 
 export function makeRefreshToken(): string {
-  return randomBytes(32).toString("hex");
+  return crypto.randomBytes(32).toString("hex");
+}
+
+export function getAPIKey(req: Request): string {
+  const apiKey = req.get("Authorization");
+  if (!apiKey) {
+    throw new UnauthorizedError("Unauthorized");
+  }
+  const token = extractToken(apiKey, "ApiKey");
+  return token;
 }

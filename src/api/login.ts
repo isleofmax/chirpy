@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { UnauthorizedError, BadRequestError } from "./errors.js";
-import { hashPassword, checkPasswordHash, makeJWT, makeRefreshToken } from "./auth.js";
+import { checkPasswordHash, makeJWT, makeRefreshToken } from "./auth.js";
 import { getUserByEmail } from "../db/queries/users.js";
 import { createRefreshToken } from "../db/queries/refreshTokens.js";
 import { config } from "../config.js";

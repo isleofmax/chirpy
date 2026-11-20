@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeAll, } from "vitest";
-import { makeJWT, validateJWT, hashPassword, checkPasswordHash, extractBearerToken } from "./api/auth.js";
+import { makeJWT, validateJWT, hashPassword, checkPasswordHash, extractToken } from "./api/auth.js";
 import { UnauthorizedError, BadRequestError } from "./api/errors.js";
 
 describe("Password Hashing", () => {
@@ -59,7 +59,7 @@ describe("JWT sign and verify", () => {
   });
 });
 
-describe("Verify token string", () => {
+describe("Verify Bearer token string", () => {
   const token = "TOKEN";
   const validString = `Bearer ${token}`;
   const notBearer = `${token}`;
@@ -67,25 +67,54 @@ describe("Verify token string", () => {
   const otherNotBearer = `Barrrr ${token}`;
 
   it("Should throw error if token is undefined", () => {
-    expect(() => extractBearerToken(undefined)).toThrow(BadRequestError);
+    expect(() => extractToken(undefined, "Bearer")).toThrow(BadRequestError);
   });
 
   it("the string is valid", () => {
-    const validToken  = extractBearerToken(validString);
+    const validToken  = extractToken(validString, "Bearer");
     expect(validToken).toBe(token);
   });
 
   it("Should throw error if the string have not the word 'Bearer'", () => {
-    expect(() => extractBearerToken(notBearer)).toThrow(BadRequestError);
+    expect(() => extractToken(notBearer, "Bearer")).toThrow(BadRequestError);
   });
 
   it("Should throw error if the string have the token before Bearer", () => {
-    expect(() => extractBearerToken(splittedToken)).toThrow(BadRequestError);
+    expect(() => extractToken(splittedToken, "Bearer")).toThrow(BadRequestError);
   });
 
   it("Should throw error if the string have the word Barrrr", () => {
-    expect(() => extractBearerToken(otherNotBearer)).toThrow(BadRequestError);
+    expect(() => extractToken(otherNotBearer, "Bearer")).toThrow(BadRequestError);
   });
 
 });
 
+describe("Verify ApiKey token string", () => {
+  const token = "TOKEN";
+  const validString = `ApiKey ${token}`;
+  const notBearer = `${token}`;
+  const splittedToken = `${token} ApiKey`;
+  const otherNotBearer = `apikey ${token}`;
+
+  it("Should throw error if token is undefined", () => {
+    expect(() => extractToken(undefined, "Bearer")).toThrow(BadRequestError);
+  });
+
+  it("the string is valid", () => {
+    const validToken  = extractToken(validString, "ApiKey");
+    expect(validToken).toBe(token);
+  });
+
+  it("Should throw error if the string have not the word 'ApiKey'", () => {
+    expect(() => extractToken(notBearer, "ApiKey")).toThrow(BadRequestError);
+  });
+
+  it("Should throw error if the string have the token before ApiKey", () => {
+    expect(() => extractToken(splittedToken, "ApiKey")).toThrow(BadRequestError);
+  });
+
+  it("Should throw error if the string have the word apikey", () => {
+    expect(() => extractToken(otherNotBearer, "ApiKey")).toThrow(BadRequestError);
+  });
+
+});

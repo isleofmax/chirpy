@@ -16,6 +16,7 @@ type APIConfig = {
   port: number;
   platform: string;
   secret: string;
+  polkaApiKey: string;
 };
 
 type Config = {
@@ -32,7 +33,8 @@ export const config: Config = {
     fileserverHits: 0,
     port: Number(envOrThrow(process.env.PORT)),
     platform: envOrThrow(process.env.PLATFORM),
-    secret: envOrThrow(process.env.SECRET)
+    secret: envOrThrow(process.env.SECRET),
+    polkaApiKey: envOrThrow(process.env.POLKA_KEY)
   }
 };
 

@@ -1,6 +1,8 @@
 import { Request, Response } from "express";
-import { BadRequestError, NotFoundError } from "./errors.js";
+import { BadRequestError, NotFoundError, UnauthorizedError } from "./errors.js";
 import { updateUserToChirpyRed } from "../db/queries/users.js";
+import { getAPIKey } from "./auth.js";
+import { config } from "../config.js";
 
 export async function polkaWebhooks(req: Request, res: Response) {
   type Data = {
@@ -10,6 +12,11 @@ export async function polkaWebhooks(req: Request, res: Response) {
   type Parameters = {
     event: string;
     data: Data;
+  }
+
+  const apiKey = getAPIKey(req);
+  if (apiKey !== config.apiConfig.polkaApiKey) {
+    throw new UnauthorizedError("Not authorized");
   }
 
   const body: Parameters = req.body;
